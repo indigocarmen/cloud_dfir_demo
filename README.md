@@ -42,6 +42,9 @@ The result of the 'make' command will be a file with a 'ko' extension.  For exam
 
 Stay logged into this EC2 Instance for the next step.  The LKM, Volatility Profile, and Rekall Profile must all match the target system and that is why we are using a matching AMI.
 
+TROUBLESHOOTING
+* Did the make step fail? You may need to edit the make file and change ```(MAKE)``` to ```make```. 
+
 ## STEP 2 - Prepare the Volatility and Rekall Profiles
 The following instructions in this step are adapted from the following references:
 * [Linux Memory Forensics Wiki](https://code.google.com/archive/p/volatility/wikis/LinuxMemoryForensics.wiki)
@@ -93,7 +96,8 @@ Next, SSH into it and run the following commands:
 sudo yum update -y
 sudo yum install -y python34
 pip install virtualenv
-virtualenv -p python3.4 env
+virtualenv -p python#.# env
+#Replace the #.# above with your python version number
 source env/bin/activate
 pip install aws_ir
 ```
@@ -104,6 +108,7 @@ REMINDER: The command to upload files via SCP to your home directory is:
 ```
 scp -i <YOUR_SSH_KEY> <YOUR_FILE>  ec2-user@<YOUR_IP_ADDRESS>:~
 ```
+Or use something like WinSCP to upload the files.
 
 NOTE: If you exit SSH, you will need to rerun `source env/bin/activate` or aws_ir will not execute
 
@@ -130,7 +135,7 @@ apt install -y awscli
 echo; echo "== SCRIPT COMPLETE"
 echo; echo "== $0 has completed"
 ```
-It may take a while for this step to complete, so continue on. Tag this EC2 Instance with the "Name" set to "SIFT Workstation"
+It may take several hours for this step to complete, so continue on. Tag this EC2 Instance with the "Name" set to "SIFT Workstation"
 
 NOTE: Some may wonder why use a second EC2 instance, thinking that the Incident Response Workstation and the SIFT Workstation can be combined. For the demo, they could. However, it is a best practice to perform the forensic analysis in a different AWS Account. In practice, the analysis may be done by a different team member as well.
 
@@ -160,6 +165,9 @@ rekall --help
 layout_tool -h
 vol.py --help
 ```
+TROUBLESHOOTING:
+* Did you get something similar to: ```pkg_resources.ContextualVersionConflict: (future 0.17.1 (/usr/local/share/env-rekall/lib/python2.7/site-packages), Requirement.parse('future==0.16.0'), set(['rekall-efilter']))```? Try running ```sudo /opt/rekall/bin/pip install future==0.16.0``` or read this: https://github.com/google/rekall/issues/448
+
 ## STEP 5 - Prepare a Demonstration Target
 For this step, simply launch another Amazon Linux t2.micro EC2 instance and in Step 3 of the Launch wizard, expand the "Advanced Details" part of the form and paste in the following code in the User Data field:
 
